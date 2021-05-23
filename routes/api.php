@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\GetAccountController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/getBankAccount/', [GetAccountController::class, 'get'])->middleware('auth:sanctum');
+Route::get('/getUserAccounts/', [GetAccountController::class, 'getUserAccounts'])->middleware('auth:sanctum');
+Route::get('/getAccountByNumber/', [GetAccountController::class, 'getAccountByNumber'])->middleware('auth:sanctum');
+Route::get('/getReceipt/{id}',[TransactionController::class, 'receipt'])->middleware('auth:sanctum');

@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\TransactionController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +16,30 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::get('/', function () {
-    return view('welcome');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->name('dashboard');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/transaction', function () {
+    return Inertia::render('Transactions/SendingTransaction');
+})->name('transaction.create');
+
+Route::get('/test', [TransactionController::class, 'transfer']);
+Route::middleware(['auth:sanctum', 'verified'])->post('/transaction', [TransactionController::class, 'transfer'])
+    ->name('transaction.send');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/receipt/{id}', function () {
+    return Inertia::render('Transactions/Receipt');
+})->name('receipt');
+Route::middleware(['auth:sanctum', 'verified'])->get('/create', function (){
+    return Inertia::render('Accounts/Create');
+})->name('accounts.create');
