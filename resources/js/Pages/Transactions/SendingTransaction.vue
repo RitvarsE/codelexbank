@@ -22,7 +22,7 @@
                             <option v-for="account in bankAccounts"
                                     :key="account"
                                     :value="{number: account.number, amount: account.amount, type: account.type}">
-                                {{this.$props.user.name}}
+                                {{ this.$props.user.name }}
                                 {{ account.number }} - {{ account.amount }}
                             </option>
                         </select>
@@ -81,9 +81,13 @@
                                 required
                             >
                                 <select name="currency"
-                                        id="currency">
-                                    <option value="EUR">EUR</option>
-                                    <option value="USD">USD</option>
+                                        id="currency"
+                                        v-model="form.currency"
+                                        required>
+                                    <option value="null">Currency</option>
+                                    <option v-for="currency in currencies" :key="currency" :value="currency.name">
+                                        {{ currency.name }}
+                                    </option>
                                 </select>
                                 <div v-if="amountToLow"
                                      style="margin-bottom: -24px"
@@ -129,7 +133,8 @@ export default {
         return {
             bankAccounts: [],
             invalidAccount: false,
-            excludeSenderAccount: []
+            excludeSenderAccount: [],
+            currencies: [],
         }
     },
     setup() {
@@ -143,12 +148,14 @@ export default {
             receiverAccount: null,
             purpose: null,
             receiver: null,
+            currency: null,
 
         })
         return {form}
     },
     beforeMount() {
         this.getData()
+        this.getCurrencies()
     },
     methods: {
         getData() {
@@ -158,6 +165,14 @@ export default {
         },
         sendMoney() {
             this.form.post('/transaction/', {})
+        },
+        getCurrencies() {
+            axios.get('/api/getCurrencies/')
+                .then(res => {
+                    this.currencies = res.data
+                    console.log(res.data)
+                })
+                .catch(error => console.log(error.message));
         }
     },
     computed: {

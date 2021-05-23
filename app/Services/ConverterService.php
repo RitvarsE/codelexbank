@@ -4,6 +4,8 @@
 namespace App\Services;
 
 use App\Models\Currency;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 class ConverterService
 {
@@ -22,5 +24,15 @@ class ConverterService
                 ['name' => $currency['ID']],
                 ['rate' => $currency['Rate'] * 10000]);
         }
+    }
+
+    public function getAllCurrencies(): Collection
+    {
+        return Currency::all();
+    }
+
+    public function getCurrency(Request $request): Currency
+    {
+        return Currency::where('name', $request->get('currency'))->first();
     }
 }

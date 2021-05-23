@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConverterController;
 use App\Http\Controllers\GetAccountController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
@@ -22,4 +23,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/getBankAccount/', [GetAccountController::class, 'get'])->middleware('auth:sanctum');
 Route::get('/getUserAccounts/', [GetAccountController::class, 'getUserAccounts'])->middleware('auth:sanctum');
 Route::get('/getAccountByNumber/', [GetAccountController::class, 'getAccountByNumber'])->middleware('auth:sanctum');
-Route::get('/getReceipt/{id}',[TransactionController::class, 'receipt'])->middleware('auth:sanctum');
+Route::get('/getReceipt/{id}', [TransactionController::class, 'receipt'])->middleware('auth:sanctum');
+Route::get('/getCurrencies/', [ConverterController::class, 'getAllCurrencies'])->middleware('auth:sanctum');
