@@ -15,12 +15,14 @@
                                 v-model="form.senderAccount"
                                 name="senderAccount"
                                 id="senderAccount"
-                                required>
+                                required
+                                @change="excludingSenderAccount">
 
                             <option disabled :value="null">Select bank account</option>
                             <option v-for="account in bankAccounts"
                                     :key="account"
-                                    :value="{number: account.number, amount: account.amount}">
+                                    :value="{number: account.number, amount: account.amount, type: account.type}">
+                                {{this.$props.user.name}}
                                 {{ account.number }} - {{ account.amount }}
                             </option>
                         </select>
@@ -33,18 +35,38 @@
                                        placeholder="Receiver"
                                        required>
                             </div>
-                            <div><input v-model="form.receiverAccount"
-                                        name="receiverAccount"
-                                        class="input"
-                                        type="text"
-                                        placeholder="Receiver account number"
-                                        minlength="13"
-                                        maxlength="13"
-                                        @input="getAccountByNumber"
-                                        required
-                                        oninvalid="this.setCustomValidity('Username cannot be blank')">
+                            <div v-if="form.errors.receiver"
+                                 style="margin-bottom: -24px"
+                                 class="text-red-500">{{ form.errors.receiver }}
                             </div>
-                            <div v-if="invalidAccount && form.receiverAccount.length === 13"
+                            <div v-if="form.senderAccount.type === 1">
+                                <select class="input"
+                                        v-model="form.receiverAccount"
+                                        name="receiverAccount"
+                                        id="receiverAccount"
+                                        required>
+
+                                    <option disabled :value="null">Select bank account</option>
+                                    <option v-for="account in excludeSenderAccount"
+                                            :key="account"
+                                            :value="account.number">
+                                        <b>{{ account.type === 0 ? 'Debit' : 'Saving' }}</b>:
+                                        {{ account.number }} - {{ account.amount }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div v-else><input v-model="form.receiverAccount"
+                                               name="receiverAccount"
+                                               class="input"
+                                               type="text"
+                                               placeholder="Receiver account number"
+                                               minlength="20"
+                                               maxlength="20"
+                                               @input="getAccountByNumber"
+                                               required
+                            >
+                            </div>
+                            <div v-if="invalidAccount && form.receiverAccount.length === 20"
                                  style="margin-bottom: -24px">
                                 Invalid account number
                             </div>
@@ -63,9 +85,13 @@
                                     <option value="EUR">EUR</option>
                                     <option value="USD">USD</option>
                                 </select>
-                                <div v-if="checkAmount"
-                                     style="margin-bottom: -24px">
-                                    You don`t have enough money
+                                <div v-if="amountToLow"
+                                     style="margin-bottom: -24px"
+                                     class="text-red-500">You don`t have money in this account
+                                </div>
+                                <div v-if="form.errors.sendingAmount"
+                                     style="margin-bottom: -24px"
+                                     class="text-red-500">{{ form.errors.sendingAmount }}
                                 </div>
                             </div>
                             <div>
@@ -78,13 +104,12 @@
                             </div>
                             <button style="margin-top: 10px"
                                     class="btn btn-primary"
-                                    :disabled="checkAmount || invalidAccount">
+                                    :disabled="invalidAccount">
                                 Send
                             </button>
                         </div>
                     </form>
                 </div>
-                <div v-if="form.errors">{{ form.errors }}</div>
                 <div v-if="message">{{ message }}</div>
             </div>
         </div>
@@ -96,21 +121,23 @@ import AppLayout from "@/Layouts/AppLayout";
 import {useForm} from '@inertiajs/inertia-vue3'
 
 export default {
-    props: ['message'],
+    props: ['message', 'user'],
     components: {
         AppLayout
     },
     data() {
         return {
             bankAccounts: [],
-            invalidAccount: false
+            invalidAccount: false,
+            excludeSenderAccount: []
         }
     },
     setup() {
         const form = useForm({
             senderAccount: {
                 amount: null,
-                number: null
+                number: null,
+                type: null,
             },
             sendingAmount: null,
             receiverAccount: null,
@@ -134,9 +161,6 @@ export default {
         }
     },
     computed: {
-        checkAmount() {
-            return this.form.senderAccount.amount < this.form.sendingAmount
-        },
         amountToLow() {
             if (this.form.senderAccount.amount <= 0) {
                 this.form.sendingAmount = null
@@ -151,6 +175,10 @@ export default {
                         this.invalidAccount = res.data.length === 0
                     })
             }
+        },
+        excludingSenderAccount() {
+            this.excludeSenderAccount = _.cloneDeep(this.bankAccounts)
+            this.excludeSenderAccount.splice(this.excludeSenderAccount.indexOf(this.form.senderAccount.number), 1)
         }
     }
 }

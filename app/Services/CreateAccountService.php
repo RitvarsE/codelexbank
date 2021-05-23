@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\BankAccount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 
 class CreateAccountService
 {
@@ -15,13 +17,22 @@ class CreateAccountService
         return 'RIT69AG0123' . $newBankAccount;
     }
 
-    public function create($user = null, Request $request = null)
+    public function create(Request $request)
     {
-        BankAccount::create([
-            'user_id' => isset($user) ? $user->id : auth()->id(),
-            'number' => $this->bankAccount(),
-            'type' => isset($request) ? (int) $request->get('accountType') : 0,
-            'currency' => isset($request) ? $request->get('currency') : 'EUR'
-        ]);
+        DB::beginTransaction();
+        try {
+            BankAccount::create([
+                'user_id' => $request->user()->id,
+                'number' => $this->bankAccount(),
+                'type' => (int)$request->get('type'),
+                'currency' => $request->get('currency')
+            ]);
+            DB::commit();
+            return Redirect::route('dashboard');
+        } catch (\Exception $error) {
+            DB::rollback();
+            return Redirect::route('error');
+        }
+
     }
 }

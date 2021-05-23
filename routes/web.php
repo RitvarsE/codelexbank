@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CreateAccountController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Redirect;
@@ -40,6 +41,13 @@ Route::middleware(['auth:sanctum', 'verified'])->post('/transaction', [Transacti
 Route::middleware(['auth:sanctum', 'verified'])->get('/receipt/{id}', function () {
     return Inertia::render('Transactions/Receipt');
 })->name('receipt');
-Route::middleware(['auth:sanctum', 'verified'])->get('/create', function (){
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/create', function () {
     return Inertia::render('Accounts/Create');
 })->name('accounts.create');
+Route::middleware(['auth:sanctum', 'verified'])->post('/create', [CreateAccountController::class, 'create'])
+    ->name('accounts.created');
+
+Route::get('error', function () {
+    return Inertia::render('Errors/Error');
+})->name('error');

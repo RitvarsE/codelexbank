@@ -4,6 +4,7 @@
 namespace App\Services;
 
 use App\Models\Transaction;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -18,16 +19,20 @@ class TransactionService
         $this->accountService = $accountService;
     }
 
-    public function transfer(Request $request)
+    public function transfer(Request $request): RedirectResponse
     {
 
-        $request->validate([
-            'senderAccount.number' => 'required|size:13|alpha_num',
-            'senderAccount.amount' => 'required|alpha_num',
-            'receiver' => 'required|exists:App\Models\User,name|'
-        ]);
         $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
         $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
+        $request->request->add(['receiver_name_validation' => $receiverAccount->user->name]);
+        var_dump($request->all());
+        $request->validate([
+            'senderAccount.number' => 'required|size:20|alpha_num',
+            'senderAccount.amount' => 'required|alpha_num|',
+            'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
+            'sendingAmount' => 'required|lte:'.$senderAccount->amount
+        ]);
+
         DB::beginTransaction();
 
         try {
@@ -48,7 +53,7 @@ class TransactionService
 
         } catch (\Exception $error) {
             DB::rollback();
-            return $error;
+            return Redirect::route('error');
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\BankAccount;
 use App\Models\User;
 use App\Services\CreateAccountService;
 use Illuminate\Auth\Events\Registered;
@@ -30,7 +31,11 @@ class EventServiceProvider extends ServiceProvider
     {
         User::created(function ($user) {
             $service = new CreateAccountService();
-            $service->create($user);
+            BankAccount::create([
+                'user_id' => $user->id,
+                'number' => $service->bankAccount(),
+                'type' => 0,
+                'currency' => 'EUR']);
         });
     }
 }
