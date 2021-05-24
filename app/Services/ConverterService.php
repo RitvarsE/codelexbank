@@ -38,8 +38,9 @@ class ConverterService
 
     public function convert(string $from, string $to, int $amount): int
     {
-        $rateTo = Currency::where('name', $to)->first()->rate;
         $rateFrom = Currency::where('name', $from)->first()->rate;
+        $rateTo = Currency::where('name', $to)->first()->rate;
+
         return $amount / $rateFrom * $rateTo;
     }
 }

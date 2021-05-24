@@ -22,6 +22,7 @@ class CreateBankAccountsTable extends Migration
             $table->boolean('type')->default(0);
             $table->bigInteger('deposit')->default(0);
             $table->bigInteger('withdraw')->default(0);
+            $table->bigInteger('tax')->default(0);
             $table->timestamps();
         });
     }

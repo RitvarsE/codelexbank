@@ -5,110 +5,119 @@
                 Receipt
             </h2>
         </template>
-        <div class="mt-4 flex items-center justify-center px-4">
+        <div v-for="receipt in receipts" :key="receipt" class="mt-4 flex items-center justify-center px-4 mb-10">
             <div class="max-w-4xl  bg-white w-full rounded-lg shadow-xl">
                 <div class="p-4 border-b">
                     <p class="text-sm text-gray-500">
-                        Receipt #{{index}}
+                        Receipt #{{ index }}
                     </p>
                 </div>
                 <div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Sender`s name
                         </p>
                         <p>
-                            {{sender.name}}
+                            {{ sender.name }}
                         </p>
                     </div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Senders`s account
                         </p>
                         <p>
-                            {{receipt.sender_account_number}}
+                            {{ receipt.sender_account_number }}
                         </p>
                     </div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Receiver`s name
                         </p>
                         <p>
-                            {{receiver.name}}
+                            {{ receiver.name }}
                         </p>
                     </div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Receiver`s account number
                         </p>
                         <p>
-                            {{receipt.receiver_account_number}}
+                            {{ receipt.receiver_account_number }}
                         </p>
                     </div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Amount
                         </p>
                         <p>
-                            {{receipt.amount}} {{receipt.currency}}
+                            {{ formatCurrency(receipt.amount, receipt.currency) }}
                         </p>
                     </div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div v-if="receipt.tax" class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                        <p class="text-gray-600">
+                            Tax
+                        </p>
+                        <p>
+                            {{ formatCurrency(receipt.tax, receipt.currency) }}
+                        </p>
+                    </div>
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Purpose of payment
                         </p>
                         <p>
-                            {{receipt.purpose}}
+                            {{ receipt.purpose }}
                         </p>
                     </div>
-                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Purpose of payment
                         </p>
                         <p>
-                            {{receipt.created_at}}
+                            {{ receipt.created_at }}
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-</app-layout>
+    </app-layout>
 </template>
 
 <script>
 import AppLayout from "@/Layouts/AppLayout";
+
 export default {
 
-    components:{
+    components: {
         AppLayout
     },
-    data(){
-        return{
+    data() {
+        return {
             index: null,
-            receipt: {},
+            receipts: {},
             sender: {},
             receiver: {},
-            receiptTime: '',
         }
     },
     beforeMount() {
         this.getIndexFromURL()
         this.getReceipt()
     },
-    methods:{
-        getIndexFromURL(){
+    methods: {
+        getIndexFromURL() {
             this.index = window.location.pathname.split('/')[2];
         },
-        getReceipt(){
-            axios.get('/api/getReceipt/'+this.index)
-            .then(res => {
-                this.receipt = res.data
-                this.receiver = res.data['receiver']
-                this.sender = res.data['sender']
-                this.receiptTime = res.data['created_at']
-                
-            })
-        }
+        getReceipt() {
+            axios.get('/api/getReceipt/' + this.index)
+                .then(res => {
+                    this.receipts = [res.data]
+                    this.receiver = res.data['receiver']
+                    this.sender = res.data['sender']
+                })
+        },
+        formatCurrency(money, currency){
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        },
     }
 }
 </script>

@@ -9,7 +9,8 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 <div>
-                    <div style="margin-bottom: -24px" v-if="form.senderAccount.amount === null ">Please select account
+                    <div style="margin-bottom: -24px"
+                         v-if="form.senderAccount.amount === null ">Please select account
                     </div>
                     <form method="post" @submit.prevent="sendMoney">
                         <select class="input"
@@ -21,7 +22,8 @@
                             <option v-for="account in bankAccounts"
                                     :key="account"
                                     :value="{number: account.number, amount: account.amount, type: account.type}">
-                                {{ this.$props.user.name }} {{ account.number }} - {{ account.amount }}
+                                {{ account.type === 0 ? 'Debit' : 'Saving' }}:
+                                {{ account.number }}  {{formatCurrency(account.amount, account.currency)}}
                             </option>
                         </select>
                         <div v-if="form.senderAccount.amount !== null">
@@ -35,7 +37,7 @@
                             </div>
                             <div v-if="form.errors.receiver"
                                  style="margin-bottom: -24px"
-                                 class="text-red-500">{{ form.errors.receiver }}
+                                 class="text-red-500">Receiver name is not associated to bank account
                             </div>
                             <div v-if="form.senderAccount.type === 1">
                                 <select class="input"
@@ -48,7 +50,7 @@
                                             :key="account"
                                             :value="account.number">
                                         {{ account.type === 0 ? 'Debit' : 'Saving' }}:
-                                        {{ account.number }} - {{ account.amount }}
+                                        {{ account.number }} - {{formatCurrency(account.amount, account.currency)}}
                                     </option>
                                 </select>
                             </div>
@@ -59,12 +61,11 @@
                                                placeholder="Receiver account number"
                                                minlength="20"
                                                maxlength="20"
-                                               @input="getAccountByNumber"
                                                required>
                             </div>
-                            <div v-if="form.errors.account"
+                            <div v-if="form.errors.receiverAccount"
                                  style="margin-bottom: -24px" class="text-red-500">
-                                {{ form.errors.account }}
+                                Invalid account, please check again!
                             </div>
                             <div><input
                                 v-model="form.sendingAmount"
@@ -76,24 +77,9 @@
                                 :disabled="amountToLow"
                                 step=".01"
                                 required>
-                                <select name="currency"
-                                        id="currency"
-                                        v-model="form.currency"
-                                        required>
-                                    <option value="EUR">EUR</option>
-                                    <option v-for="currency in currencies"
-                                            :key="currency"
-                                            :value="currency.name">
-                                        {{ currency.name }}
-                                    </option>
-                                </select>
-                                <div v-if="amountToLow"
-                                     style="margin-bottom: -24px"
-                                     class="text-red-500">You don`t have money in this account
-                                </div>
                                 <div v-if="form.errors.sendingAmount"
                                      style="margin-bottom: -24px"
-                                     class="text-red-500">{{ form.errors.sendingAmount }}
+                                     class="text-red-500"> Your don`t have that much money
                                 </div>
                             </div>
                             <div>
@@ -112,7 +98,6 @@
                         </div>
                     </form>
                 </div>
-                <div v-if="message">{{ message }}</div>
             </div>
         </div>
     </app-layout>
@@ -131,7 +116,6 @@ export default {
         return {
             bankAccounts: [],
             excludeSenderAccount: [],
-            currencies: [],
         }
     },
     setup() {
@@ -145,14 +129,12 @@ export default {
             receiverAccount: null,
             purpose: null,
             receiver: null,
-            currency: 'EUR',
 
         })
         return {form}
     },
     beforeMount() {
         this.getData()
-        this.getCurrencies()
     },
     methods: {
         getData() {
@@ -163,14 +145,9 @@ export default {
         sendMoney() {
             this.form.post('/transaction/', {})
         },
-        getCurrencies() {
-            axios.get('/api/getCurrencies/')
-                .then(res => {
-                    res.data.shift()
-                    this.currencies = res.data
-                })
-                .catch(error => console.log(error.message));
-        }
+        formatCurrency(money, currency){
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        },
     },
     computed: {
         amountToLow() {
@@ -179,17 +156,9 @@ export default {
             }
             return this.form.senderAccount.amount <= 0
         },
-        getAccountByNumber() {
-            if (this.form.receiverAccount.length === 13) {
-                this.invalidAccount = false
-                axios.get('/api/getAccountByNumber', {params: {account: this.form.receiverAccount}})
-                    .then(res => {
-                        this.invalidAccount = res.data.length === 0
-                    })
-            }
-        },
         excludingSenderAccount() {
             this.excludeSenderAccount = _.cloneDeep(this.bankAccounts)
+            console.log(this.excludeSenderAccount)
             this.excludeSenderAccount.splice(this.excludeSenderAccount.indexOf(this.form.senderAccount.number), 1)
         }
     }

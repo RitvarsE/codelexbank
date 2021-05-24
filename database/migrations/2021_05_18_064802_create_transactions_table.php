@@ -20,6 +20,7 @@ class CreateTransactionsTable extends Migration
             $table->smallInteger('receiver_id');
             $table->string('receiver_account_number');
             $table->bigInteger('amount');
+            $table->bigInteger('tax')->nullable();
             $table->string('currency');
             $table->string('purpose');
             $table->timestamps();

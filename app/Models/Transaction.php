@@ -17,7 +17,8 @@ class Transaction extends Model
         'currency',
         'sender_account_number',
         'receiver_account_number',
-        'purpose'
+        'purpose',
+        'tax'
     ];
 
     protected $hidden = [

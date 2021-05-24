@@ -26,40 +26,61 @@ class TransactionService
 
     public function transfer(Request $request): RedirectResponse
     {
-    /// jāpārtaisa, ka sūtīt var tikai to valūtu, kas tev ir kontā. Konvertācija notiek tikai saņemot naudu.
-        /// Uztaisīt, ka receipt pēc transakcijas rāda caur api nevis adresbāru
-        ///
         $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
         $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
 
         $request->request->add(['receiver_name_validation' => $receiverAccount->user->name]);
 
-        $amount = $request->get('senderAccount')['amount'];
-        $currencyFrom = $senderAccount->currency;
-        $currencyTo = $request->get('currency');
+        $amount = $request->get('sendingAmount') * 100;
 
-        $convertedAmount = $this->converterService->convert($currencyTo, $currencyFrom, $amount);
+        $convertedAmount = $this->converterService->convert(
+            $senderAccount->currency,
+            $receiverAccount->currency,
+            $amount);
+
+        $amountForTaxes = $convertedAmount;
 
         $request->validate([
             'senderAccount.number' => 'required|size:20|alpha_num',
             'senderAccount.amount' => 'required|alpha_num|',
             'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
-            'sendingAmount' => 'required|lte:' . $convertedAmount
+            'sendingAmount' => 'required|lte:' . $senderAccount->amount / 100,
+            'purpose' => 'required|min:5',
+            'receiverAccount' => 'required|size:20|Exists:App\Models\BankAccount,number|different:senderAccount.number'
         ]);
 
         DB::beginTransaction();
 
         try {
-            $receiverAccount->update(['amount' => $receiverAccount->amount + $amount]);
-            $senderAccount->update(['amount' => $senderAccount->amount - $convertedAmount]);
+            if ($senderAccount->type === 1 && $convertedAmount + $senderAccount->withdraw > $senderAccount->deposit) {
+                if ($senderAccount->deposit - $senderAccount->withdraw <= 0) {
+                    $convertedAmount = $convertedAmount * 0.8;
+                    $amountForTaxes -= $convertedAmount;
+
+                } else {
+                    $convertedAmount = ($convertedAmount + $senderAccount->withdraw - $senderAccount->deposit)
+                        * 0.8 + $senderAccount->deposit - $senderAccount->withdraw;
+                    $amountForTaxes -= $convertedAmount;
+                }
+            }
+            $receiverAccount->update(
+                ['amount' => $receiverAccount->amount + $convertedAmount,
+                    'deposit' => $receiverAccount->deposit + $convertedAmount]);
+
+            $senderAccount->update(
+                ['amount' => $senderAccount->amount - $amount,
+                    'withdraw' => $senderAccount->withdraw + $amount,
+                    'tax' => $senderAccount->tax + ($amountForTaxes === $convertedAmount ? 0 : $amountForTaxes)]
+            );
             $transaction = Transaction::create([
                 'sender_id' => $senderAccount->user_id,
                 'receiver_id' => $receiverAccount->user_id,
-                'amount' => $request->get('sendingAmount'),
+                'amount' => $convertedAmount,
                 'currency' => $senderAccount->currency,
                 'sender_account_number' => $senderAccount->number,
                 'receiver_account_number' => $receiverAccount->number,
-                'purpose' => $request->get('purpose')
+                'purpose' => $request->get('purpose'),
+                'tax' => $amountForTaxes === $convertedAmount ? null : $amountForTaxes
             ]);
 
             DB::commit();

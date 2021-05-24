@@ -6,7 +6,7 @@
             </h2>
         </template>
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                     <div class="p-4 border-b">
                         <p class="text-sm text-gray-500">
@@ -15,7 +15,7 @@
                     </div>
                     <div v-for="account in bankAccounts" :key="account">
                         <div class="mt-4 flex items-center justify-center px-4 mb-3">
-                            <div class="max-w-4xl  bg-white w-full rounded-lg shadow-xl">
+                            <div class="max-w-2xl  bg-white w-full rounded-lg shadow-xl">
                                 <div>
                                     <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
                                         <p class="text-gray-600">
@@ -38,7 +38,7 @@
                                             Amount
                                         </p>
                                         <p>
-                                            {{account.amount}}
+                                            {{formatCurrency(account.amount, account.currency)}}
                                         </p>
                                     </div>
                                     <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
@@ -82,7 +82,10 @@ export default {
             axios.get('/api/getUserAccounts/').then((response) => {
                 this.bankAccounts = response.data
             })
-        }
+        },
+        formatCurrency(money, currency){
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        },
     },
 
 }
