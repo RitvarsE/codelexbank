@@ -4,6 +4,8 @@
 namespace App\Services;
 
 use App\Models\Transaction;
+use App\Models\User;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
@@ -24,7 +26,9 @@ class TransactionService
 
     public function transfer(Request $request): RedirectResponse
     {
-
+    /// jāpārtaisa, ka sūtīt var tikai to valūtu, kas tev ir kontā. Konvertācija notiek tikai saņemot naudu.
+        /// Uztaisīt, ka receipt pēc transakcijas rāda caur api nevis adresbāru
+        ///
         $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
         $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
 
@@ -34,20 +38,20 @@ class TransactionService
         $currencyFrom = $senderAccount->currency;
         $currencyTo = $request->get('currency');
 
-        $convertedAmount = $this->converterService->convert($currencyFrom, $currencyTo, $amount);
+        $convertedAmount = $this->converterService->convert($currencyTo, $currencyFrom, $amount);
 
         $request->validate([
             'senderAccount.number' => 'required|size:20|alpha_num',
             'senderAccount.amount' => 'required|alpha_num|',
             'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
-            'sendingAmount' => 'required|lte:' . $amount
+            'sendingAmount' => 'required|lte:' . $convertedAmount
         ]);
 
         DB::beginTransaction();
 
         try {
-            $receiverAccount->update(['amount' => $receiverAccount->amount + $request->get('sendingAmount')]);
-            $senderAccount->update(['amount' => $senderAccount->amount - $request->get('sendingAmount')]);
+            $receiverAccount->update(['amount' => $receiverAccount->amount + $amount]);
+            $senderAccount->update(['amount' => $senderAccount->amount - $convertedAmount]);
             $transaction = Transaction::create([
                 'sender_id' => $senderAccount->user_id,
                 'receiver_id' => $receiverAccount->user_id,
@@ -61,15 +65,15 @@ class TransactionService
             DB::commit();
             return Redirect::route('receipt', $transaction->id);
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             DB::rollback();
             return Redirect::route('error');
         }
     }
 
-    public function receipt(int $id): Model
+    public function receipt(Transaction $transaction): Model
     {
-        return Transaction::with(['sender', 'receiver'])->find($id);
+        return Transaction::with(['sender', 'receiver'])->find($transaction->id);
     }
 
     public function transactionHistory(Request $request): Collection

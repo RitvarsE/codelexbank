@@ -8,8 +8,50 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <div class="p-4 border-b">
+                        <p class="text-sm text-gray-500">
+                            Accounts
+                        </p>
+                    </div>
                     <div v-for="account in bankAccounts" :key="account">
-                        {{ account.number }} - {{ account.amount }}
+                        <div class="mt-4 flex items-center justify-center px-4 mb-3">
+                            <div class="max-w-4xl  bg-white w-full rounded-lg shadow-xl">
+                                <div>
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                        <p class="text-gray-600">
+                                           Number
+                                        </p>
+                                        <p>
+                                            {{account.number}}
+                                        </p>
+                                    </div>
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                        <p class="text-gray-600">
+                                            Currency
+                                        </p>
+                                        <p>
+                                            {{account.currency}}
+                                        </p>
+                                    </div>
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                        <p class="text-gray-600">
+                                            Amount
+                                        </p>
+                                        <p>
+                                            {{account.amount}}
+                                        </p>
+                                    </div>
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                        <p class="text-gray-600">
+                                            Type
+                                        </p>
+                                        <p>
+                                            {{ account.type === 0 ? 'Debit' : 'Saving' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -23,6 +23,6 @@ class GetAccountController extends Controller
 
     public function getUserAccounts(Request $request): JsonResponse
     {
-        return response()->json($this->service->getUserAccounts($request->user()->id));
+        return response()->json($this->service->getUserAccounts($request));
     }
 }

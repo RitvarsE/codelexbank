@@ -3,7 +3,6 @@
 use App\Http\Controllers\CreateAccountController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

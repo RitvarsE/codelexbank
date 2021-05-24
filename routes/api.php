@@ -26,7 +26,7 @@ Route::get('/getUserAccounts/', [GetAccountController::class, 'getUserAccounts']
 
 Route::get('/getAccountByNumber/', [GetAccountController::class, 'getAccountByNumber'])->middleware('auth:sanctum');
 
-Route::get('/getReceipt/{id}', [TransactionController::class, 'receipt'])->middleware('auth:sanctum');
+Route::get('/getReceipt/{transaction}', [TransactionController::class, 'receipt'])->middleware('auth:sanctum');
 
 Route::get('/getCurrencies/', [ConverterController::class, 'getAllCurrencies'])->middleware('auth:sanctum');
 

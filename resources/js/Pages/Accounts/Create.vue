@@ -23,11 +23,15 @@
                                  id="currency"
                                  v-model="form.currency"
                                  required>
-                        <option v-for="currency in currencies" :key="currency" :value="currency.name">
+                        <option value="EUR">EUR</option>
+                        <option v-for="currency in currencies"
+                                :key="currency"
+                                :value="currency.name">
                             {{ currency.name }}
                         </option>
                     </select></div>
-                    <button class="btn btn-primary mt-6" type="submit">Submit</button>
+                    <button class="btn btn-primary mt-6"
+                            type="submit">Submit</button>
                 </form>
             </div>
         </div>
@@ -51,8 +55,8 @@ export default {
     },
     setup() {
         const form = useForm({
-            type: null,
-            currency: null,
+            type: 0,
+            currency: 'EUR',
         })
         return {form}
     },
@@ -64,6 +68,7 @@ export default {
             getCurrencies() {
                 axios.get('/api/getCurrencies/')
                     .then(res => {
+                        res.data.shift()
                         this.currencies = res.data
                     })
                     .catch(error => console.log(error.message));
