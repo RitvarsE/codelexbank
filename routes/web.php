@@ -52,6 +52,7 @@ Route::get('error', function () {
     return Inertia::render('Errors/Error');
 })->name('error');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/transactions', function (){
+Route::middleware(['auth:sanctum', 'verified'])->get('/transactions', function () {
     return Inertia::render('Transactions/History');
 })->name('transactions.history');
+Route::get('getQuote/{quote}', [\App\Services\StockService::class, 'getQuote']);
