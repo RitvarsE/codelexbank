@@ -55,4 +55,8 @@ Route::get('error', function () {
 Route::middleware(['auth:sanctum', 'verified'])->get('/transactions', function () {
     return Inertia::render('Transactions/History');
 })->name('transactions.history');
-Route::get('getQuote/{quote}', [\App\Services\StockService::class, 'getQuote']);
+//Route::get('getQuote/{quote}', [\App\Services\StockService::class, 'getQuote']); vajadzēs
+Route::middleware(['auth:sanctum', 'verified'])->get('/stock', function () {
+    return Inertia::render('Stocks/Purchased');
+})->name('stocks.purchased');
+
