@@ -2,12 +2,14 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Open new account
+                Transaction history
             </h2>
-            <div v-for="transaction in transactions" :key="transaction">
-                {{ transaction }}
-            </div>
         </template>
+        <div v-for="transaction in transactions" :key="transaction">
+            {{ transaction }}<br>
+            ------------------------------------------- <br>
+
+        </div>
     </app-layout>
 </template>
 
