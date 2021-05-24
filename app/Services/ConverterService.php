@@ -35,4 +35,14 @@ class ConverterService
     {
         return Currency::where('name', $request->get('currency'))->first();
     }
+
+    public function convert(string $from, string $to, int $amount): int
+    {
+        $rateFrom = Currency::where('name', $from)->first()->rate;
+        $rateTo = Currency::where('name', $to)->first()->rate;
+        if ($from === 'EUR') {
+            return $amount * $rateTo;
+        }
+        return $amount / $rateFrom * $rateTo;
+    }
 }

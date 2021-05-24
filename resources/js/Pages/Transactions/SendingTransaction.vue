@@ -84,7 +84,7 @@
                                         id="currency"
                                         v-model="form.currency"
                                         required>
-                                    <option value="null">Currency</option>
+                                    <option value="EUR">EUR</option>
                                     <option v-for="currency in currencies" :key="currency" :value="currency.name">
                                         {{ currency.name }}
                                     </option>

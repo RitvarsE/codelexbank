@@ -45,9 +45,14 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/receipt/{id}', function (
 Route::middleware(['auth:sanctum', 'verified'])->get('/create', function () {
     return Inertia::render('Accounts/Create');
 })->name('accounts.create');
+
 Route::middleware(['auth:sanctum', 'verified'])->post('/create', [CreateAccountController::class, 'create'])
     ->name('accounts.created');
 
 Route::get('error', function () {
     return Inertia::render('Errors/Error');
 })->name('error');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/transactions', function (){
+    return Inertia::render('Transactions/History');
+})->name('transactions.history');

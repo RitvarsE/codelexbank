@@ -26,6 +26,9 @@
                                 <jet-nav-link :href="route('accounts.create')" :active="route().current('accounts.create')">
                                     Open account
                                 </jet-nav-link>
+                                <jet-nav-link :href="route('transactions.history')" :active="route().current('transactions.history')">
+                                    History
+                                </jet-nav-link>
                             </div>
                         </div>
 

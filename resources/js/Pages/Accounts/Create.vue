@@ -19,13 +19,14 @@
                             <option value="1">Saving account</option>
                         </select></div>
                     <jet-label for="type" value="Choose currency"/>
-                    <div><select class="input"
-                                 name="currency"
+                    <div><select name="currency"
                                  id="currency"
                                  v-model="form.currency"
                                  required>
                         <option value="EUR">EUR</option>
-                        <option value="USD">USD</option>
+                        <option v-for="currency in currencies" :key="currency" :value="currency.name">
+                            {{ currency.name }}
+                        </option>
                     </select></div>
                     <button class="btn btn-primary mt-6" type="submit">Submit</button>
                 </form>
@@ -40,6 +41,11 @@ import {useForm} from "@inertiajs/inertia-vue3";
 import JetLabel from "@/Jetstream/Label";
 
 export default {
+    data() {
+        return {
+            currencies: []
+        }
+    },
     components: {
         AppLayout,
         JetLabel
@@ -55,8 +61,18 @@ export default {
         {
             create() {
                 this.form.post('/create')
+            },
+            getCurrencies() {
+                axios.get('/api/getCurrencies/')
+                    .then(res => {
+                        this.currencies = res.data
+                    })
+                    .catch(error => console.log(error.message));
             }
-        }
+        },
+    beforeMount() {
+        this.getCurrencies()
+    }
 }
 </script>
 

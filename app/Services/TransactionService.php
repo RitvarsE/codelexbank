@@ -4,6 +4,7 @@
 namespace App\Services;
 
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,20 +24,23 @@ class TransactionService
 
     public function transfer(Request $request): RedirectResponse
     {
-/// jāsraksta loģiski viss ar konvertāciju.
+
         $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
         $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
 
         $request->request->add(['receiver_name_validation' => $receiverAccount->user->name]);
 
-        $currencyRate = $this->converterService->getCurrency($request);
-        $amount = $senderAccount->amount * ($currencyRate->name === 'EUR' ? 1 : $currencyRate->rate) /10000;
+        $amount = $request->get('senderAccount')['amount'];
+        $currencyFrom = $senderAccount->currency;
+        $currencyTo = $request->get('currency');
+
+        $convertedAmount = $this->converterService->convert($currencyFrom, $currencyTo, $amount);
 
         $request->validate([
             'senderAccount.number' => 'required|size:20|alpha_num',
             'senderAccount.amount' => 'required|alpha_num|',
             'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
-            'sendingAmount' => 'required|lte:'.$amount
+            'sendingAmount' => 'required|lte:' . $amount
         ]);
 
         DB::beginTransaction();
@@ -66,5 +70,14 @@ class TransactionService
     public function receipt(int $id): Model
     {
         return Transaction::with(['sender', 'receiver'])->find($id);
+    }
+
+    public function transactionHistory(Request $request): Collection
+    {
+        $id = $request->user()->id;
+        return Transaction::with(['sender', 'receiver'])
+            ->where('sender_id', $id)
+            ->orWhere('receiver_id', $id)
+            ->get();
     }
 }

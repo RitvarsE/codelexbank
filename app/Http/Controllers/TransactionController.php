@@ -20,8 +20,14 @@ class TransactionController extends Controller
     {
         return $this->service->transfer($request);
     }
+
     public function receipt(int $id): JsonResponse
     {
-       return response()->json($this->service->receipt($id));
+        return response()->json($this->service->receipt($id));
+    }
+
+    public function transactionHistory(Request $request): JsonResponse
+    {
+        return response()->json($this->service->transactionHistory($request));
     }
 }
