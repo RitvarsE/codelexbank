@@ -34,8 +34,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/transaction', function ()
 })->name('transaction.create');
 
 Route::get('/test', [TransactionController::class, 'transfer']);
-Route::middleware(['auth:sanctum', 'verified'])->post('/transaction', [TransactionController::class, 'transfer'])
-    ->name('transaction.send');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/receipt/{id}', function () {
     return Inertia::render('Transactions/Receipt');
@@ -60,3 +58,5 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/stock', function () {
     return Inertia::render('Stocks/Purchased');
 })->name('stocks.purchased');
 
+Route::middleware(['auth:sanctum', 'verified'])->post('/validation', [TransactionController::class, 'validation'])
+    ->name('transaction.send');

@@ -12,7 +12,7 @@
                     <div style="margin-bottom: -24px"
                          v-if="form.senderAccount.amount === null ">Please select account
                     </div>
-                    <form method="post" @submit.prevent="sendMoney">
+                    <form method="post" @submit.prevent="validate">
                         <select class="input"
                                 v-model="form.senderAccount"
                                 name="senderAccount"
@@ -23,7 +23,7 @@
                                     :key="account"
                                     :value="{number: account.number, amount: account.amount, type: account.type}">
                                 {{ account.type === 0 ? 'Debit' : 'Saving' }}:
-                                {{ account.number }}  {{formatCurrency(account.amount, account.currency)}}
+                                {{ account.number }} {{ formatCurrency(account.amount, account.currency) }}
                             </option>
                         </select>
                         <div v-if="form.senderAccount.amount !== null">
@@ -50,7 +50,7 @@
                                             :key="account"
                                             :value="account.number">
                                         {{ account.type === 0 ? 'Debit' : 'Saving' }}:
-                                        {{ account.number }} - {{formatCurrency(account.amount, account.currency)}}
+                                        {{ account.number }} - {{ formatCurrency(account.amount, account.currency) }}
                                     </option>
                                 </select>
                             </div>
@@ -92,8 +92,26 @@
                             </div>
                             <button style="margin-top: 10px"
                                     class="btn btn-primary"
-                                    :disabled="amountToLow">
+                                    :disabled="amountToLow || $page.props.code">
                                 Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div v-if="$page.props.code" class="popup">
+                <div class="center">
+                    Check your email for verification code
+                    <form @submit.prevent="verifyCode">
+                        <input class="input"
+                               v-model="verify.code"
+                               name="verificationCode"
+                               type="text"
+                               placeholder="verificationCode"
+                               required>
+                        <div>
+                            <button class="btn btn-primary mt-2"
+                                    :disabled="verify.code.length < 20"> Verify
                             </button>
                         </div>
                     </form>
@@ -108,7 +126,7 @@ import AppLayout from "@/Layouts/AppLayout";
 import {useForm} from '@inertiajs/inertia-vue3'
 
 export default {
-    props: ['message', 'user'],
+    props: ['user', 'code'],
     components: {
         AppLayout
     },
@@ -116,22 +134,21 @@ export default {
         return {
             bankAccounts: [],
             excludeSenderAccount: [],
+            form: this.$inertia.form({
+                senderAccount: {
+                    amount: null,
+                    number: null,
+                    type: null,
+                },
+                sendingAmount: null,
+                receiverAccount: null,
+                purpose: null,
+                receiver: null,
+            }),
+            verify: this.$inertia.form({
+                code: '',
+            })
         }
-    },
-    setup() {
-        const form = useForm({
-            senderAccount: {
-                amount: null,
-                number: null,
-                type: null,
-            },
-            sendingAmount: null,
-            receiverAccount: null,
-            purpose: null,
-            receiver: null,
-
-        })
-        return {form}
     },
     beforeMount() {
         this.getData()
@@ -142,11 +159,18 @@ export default {
                 this.bankAccounts = response.data
             })
         },
-        sendMoney() {
-            this.form.post('/transaction/', {})
+        validate() {
+            this.form.post('/api/validation/')
         },
-        formatCurrency(money, currency){
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        verifyCode() {
+            this.verify.post('/api/transaction/', {
+                onSuccess:() => {
+                    this.form.post('/api/sendMoney/')
+                }
+            })
+        },
+        formatCurrency(money, currency) {
+            return new Intl.NumberFormat('en-US', {style: 'currency', currency: currency}).format(money / 100)
         },
     },
     computed: {
@@ -157,8 +181,8 @@ export default {
             return this.form.senderAccount.amount <= 0
         },
         excludingSenderAccount() {
+            /// šis jāsataisa, kaut kas nenostrādā.
             this.excludeSenderAccount = _.cloneDeep(this.bankAccounts)
-            console.log(this.excludeSenderAccount)
             this.excludeSenderAccount.splice(this.excludeSenderAccount.indexOf(this.form.senderAccount.number), 1)
         }
     }
@@ -168,5 +192,22 @@ export default {
 .input {
     margin-top: 30px;
     width: 300px;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    display: flex;
+    justify-content: center;
+    width: 33.33%;
+    height: 300px;
+}
+
+.center {
+    align-self: center;
+    padding: 2rem;
 }
 </style>

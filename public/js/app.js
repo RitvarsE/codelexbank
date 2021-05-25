@@ -18212,7 +18212,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      showingNavigationDropdown: false
+      showingNavigationDropdown: false,
+      listOne: false
     };
   },
   methods: {
@@ -19550,30 +19551,28 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['message', 'user'],
+  props: ['user', 'code'],
   components: {
     AppLayout: _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_0__.default
   },
   data: function data() {
     return {
       bankAccounts: [],
-      excludeSenderAccount: []
-    };
-  },
-  setup: function setup() {
-    var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)({
-      senderAccount: {
-        amount: null,
-        number: null,
-        type: null
-      },
-      sendingAmount: null,
-      receiverAccount: null,
-      purpose: null,
-      receiver: null
-    });
-    return {
-      form: form
+      excludeSenderAccount: [],
+      form: this.$inertia.form({
+        senderAccount: {
+          amount: null,
+          number: null,
+          type: null
+        },
+        sendingAmount: null,
+        receiverAccount: null,
+        purpose: null,
+        receiver: null
+      }),
+      verify: this.$inertia.form({
+        code: ''
+      })
     };
   },
   beforeMount: function beforeMount() {
@@ -19587,8 +19586,17 @@ __webpack_require__.r(__webpack_exports__);
         _this.bankAccounts = response.data;
       });
     },
-    sendMoney: function sendMoney() {
-      this.form.post('/transaction/', {});
+    validate: function validate() {
+      this.form.post('/api/validation/');
+    },
+    verifyCode: function verifyCode() {
+      var _this2 = this;
+
+      this.verify.post('/api/transaction/', {
+        onSuccess: function onSuccess() {
+          _this2.form.post('/api/sendMoney/');
+        }
+      });
     },
     formatCurrency: function formatCurrency(money, currency) {
       return new Intl.NumberFormat('en-US', {
@@ -19606,8 +19614,8 @@ __webpack_require__.r(__webpack_exports__);
       return this.form.senderAccount.amount <= 0;
     },
     excludingSenderAccount: function excludingSenderAccount() {
+      /// šis jāsataisa, kaut kas nenostrādā.
       this.excludeSenderAccount = _.cloneDeep(this.bankAccounts);
-      console.log(this.excludeSenderAccount);
       this.excludeSenderAccount.splice(this.excludeSenderAccount.indexOf(this.form.senderAccount.number), 1);
     }
   }
@@ -24794,6 +24802,16 @@ var _hoisted_10 = {
   },
   "class": "text-red-500"
 };
+var _hoisted_11 = {
+  key: 0,
+  "class": "popup"
+};
+var _hoisted_12 = {
+  "class": "center"
+};
+
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Check your email for verification code ");
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_app_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("app-layout");
 
@@ -24802,15 +24820,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [_hoisted_1];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [$setup.form.senderAccount.amount === null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_4, "Please select account ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("form", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [$data.form.senderAccount.amount === null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_4, "Please select account ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("form", {
         method: "post",
         onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-          return $options.sendMoney && $options.sendMoney.apply($options, arguments);
+          return $options.validate && $options.validate.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
         "class": "input",
         "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-          return $setup.form.senderAccount = $event;
+          return $data.form.senderAccount = $event;
         }),
         name: "senderAccount",
         id: "senderAccount",
@@ -24833,10 +24851,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))], 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.form.senderAccount]]), $setup.form.senderAccount.amount !== null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.senderAccount]]), $data.form.senderAccount.amount !== null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
         "class": "input",
         "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
-          return $setup.form.receiver = $event;
+          return $data.form.receiver = $event;
         }),
         name: "receiver",
         type: "text",
@@ -24844,10 +24862,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         required: ""
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form.receiver]])]), $setup.form.errors.receiver ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_6, "Receiver name is not associated to bank account ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $setup.form.senderAccount.type === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.receiver]])]), $data.form.errors.receiver ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_6, "Receiver name is not associated to bank account ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.form.senderAccount.type === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
         "class": "input",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
-          return $setup.form.receiverAccount = $event;
+          return $data.form.receiverAccount = $event;
         }),
         name: "receiverAccount",
         id: "receiverAccount",
@@ -24863,9 +24881,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.form.receiverAccount]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.receiverAccount]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
         "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
-          return $setup.form.receiverAccount = $event;
+          return $data.form.receiverAccount = $event;
         }),
         name: "receiverAccount",
         "class": "input",
@@ -24876,9 +24894,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         required: ""
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form.receiverAccount]])])), $setup.form.errors.receiverAccount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_9, " Invalid account, please check again! ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.receiverAccount]])])), $data.form.errors.receiverAccount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_9, " Invalid account, please check again! ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
         "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
-          return $setup.form.sendingAmount = $event;
+          return $data.form.sendingAmount = $event;
         }),
         name: "sendingAmount",
         id: "sendingAmount",
@@ -24890,10 +24908,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         required: ""
       }, null, 8
       /* PROPS */
-      , ["disabled"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form.sendingAmount]]), $setup.form.errors.sendingAmount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_10, " Your don`t have that much money ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      , ["disabled"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.sendingAmount]]), $data.form.errors.sendingAmount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_10, " Your don`t have that much money ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
         "class": "input",
         "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
-          return $setup.form.purpose = $event;
+          return $data.form.purpose = $event;
         }),
         name: "purpose",
         type: "text",
@@ -24901,17 +24919,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         required: ""
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form.purpose]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.purpose]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
         style: {
           "margin-top": "10px"
         },
         "class": "btn btn-primary",
-        disabled: $options.amountToLow
+        disabled: $options.amountToLow || _ctx.$page.props.code
       }, " Send ", 8
       /* PROPS */
       , ["disabled"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 32
       /* HYDRATE_EVENTS */
-      )])])])];
+      )])]), _ctx.$page.props.code ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("form", {
+        onSubmit: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+          return $options.verifyCode && $options.verifyCode.apply($options, arguments);
+        }, ["prevent"]))
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+        "class": "input",
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+          return $data.verify.code = $event;
+        }),
+        name: "verificationCode",
+        type: "text",
+        placeholder: "verificationCode",
+        required: ""
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.verify.code]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+        "class": "btn btn-primary mt-2",
+        disabled: $data.verify.code.length < 20
+      }, " Verify ", 8
+      /* PROPS */
+      , ["disabled"])])], 32
+      /* HYDRATE_EVENTS */
+      )])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
     }),
     _: 1
     /* STABLE */
@@ -25199,7 +25239,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.input {\n    margin-top: 30px;\n    width: 300px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.input {\n    margin-top: 30px;\n    width: 300px;\n}\n.popup {\n    position: fixed;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    background: white;\n    display: flex;\n    justify-content: center;\n    width: 33.33%;\n    height: 300px;\n}\n.center {\n    align-self: center;\n    padding: 2rem;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

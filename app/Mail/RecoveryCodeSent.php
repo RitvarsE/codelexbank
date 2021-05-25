@@ -21,14 +21,8 @@ class RecoveryCodeSent extends Mailable
         //
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
+
     public function build()
     {
-        $recoveryCode = json_decode(decrypt(auth()->user()->two_factor_recovery_codes))[0];
-        return $this->markdown('recoveryCode.recovery-code')->with('recoveryCode', $recoveryCode);
     }
 }

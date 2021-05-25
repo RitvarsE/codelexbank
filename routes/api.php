@@ -31,3 +31,14 @@ Route::get('/getReceipt/{transaction}', [TransactionController::class, 'receipt'
 Route::get('/getCurrencies/', [ConverterController::class, 'getAllCurrencies'])->middleware('auth:sanctum');
 
 Route::get('/history', [TransactionController::class, 'transactionHistory'])->middleware('auth:sanctum');
+
+Route::post('/history', [TransactionController::class, 'transaction'])->middleware('auth:sanctum');
+
+Route::middleware(['auth:sanctum', 'verified'])->post('/validation', [TransactionController::class, 'validation'])
+    ->name('transaction.validate');
+
+Route::middleware(['auth:sanctum', 'verified'])->post('/transaction', [TransactionController::class, 'transaction'])
+    ->name('transaction.send');
+Route::middleware(['auth:sanctum', 'verified'])->post('/sendMoney', [TransactionController::class, 'sendMoney'])
+    ->name('transaction.validate');
+

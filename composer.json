@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.5",
         "tightenco/ziggy": "^1.0",
         "ext-json": "*",
-      "ext-simplexml": "*"
+      "ext-simplexml": "*",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

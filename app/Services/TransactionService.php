@@ -3,14 +3,16 @@
 
 namespace App\Services;
 
+use App\Mail\SendVerificationCode;
 use App\Models\Transaction;
-use App\Models\User;
+use App\Models\VerificationCode;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 
 class TransactionService
@@ -24,12 +26,34 @@ class TransactionService
         $this->converterService = $converterService;
     }
 
-    public function transfer(Request $request): RedirectResponse
+    public function validation(Request $request): RedirectResponse
     {
         $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
         $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
 
+
         $request->request->add(['receiver_name_validation' => $receiverAccount->user->name]);
+        $request->validate([
+            'senderAccount.number' => 'required|size:20|alpha_num',
+            'senderAccount.amount' => 'required|alpha_num|',
+            'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
+            'sendingAmount' => 'required|lte:' . $senderAccount->amount / 100,
+            'purpose' => 'required|min:5',
+            'receiverAccount' => 'required|size:20|Exists:App\Models\BankAccount,number|different:senderAccount.number'
+        ]);
+
+        $verificationCode = VerificationCode::create([
+            'code' => bin2hex(openssl_random_pseudo_bytes(10))]);
+
+        Mail::to($request->user())->send(new SendVerificationCode($verificationCode));
+
+        return back()->with(['code' => $verificationCode]);
+    }
+
+    public function sendMoney(Request $request)
+    {
+        $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
+        $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
 
         $amount = $request->get('sendingAmount') * 100;
 
@@ -39,15 +63,6 @@ class TransactionService
             $amount);
 
         $amountForTaxes = $convertedAmount;
-
-        $request->validate([
-            'senderAccount.number' => 'required|size:20|alpha_num',
-            'senderAccount.amount' => 'required|alpha_num|',
-            'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
-            'sendingAmount' => 'required|lte:' . $senderAccount->amount / 100,
-            'purpose' => 'required|min:5',
-            'receiverAccount' => 'required|size:20|Exists:App\Models\BankAccount,number|different:senderAccount.number'
-        ]);
 
         DB::beginTransaction();
 
@@ -90,6 +105,14 @@ class TransactionService
             DB::rollback();
             return Redirect::route('error');
         }
+    }
+
+    public function transaction(Request $request)
+    {
+        $request->validate([
+            'code' => 'exists:App\Models\VerificationCode,code|required'
+        ]);
+        return back();
     }
 
     public function receipt(Transaction $transaction): Model
