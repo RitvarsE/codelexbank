@@ -5,10 +5,10 @@
                 Dashboard
             </h2>
         </template>
-        <div class="py-12">
+        <div class="py-3">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-4 border-b">
+                    <div class="p-3 border-b">
                         <p class="text-sm text-gray-500">
                             Accounts
                         </p>
@@ -17,7 +17,7 @@
                         <div class="mt-4 flex items-center justify-center px-4 mb-3">
                             <div class="max-w-2xl  bg-white w-full rounded-lg shadow-xl">
                                 <div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                            Number
                                         </p>
@@ -25,7 +25,7 @@
                                             {{account.number}}
                                         </p>
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                             Currency
                                         </p>
@@ -33,7 +33,7 @@
                                             {{account.currency}}
                                         </p>
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                             Amount
                                         </p>
@@ -41,7 +41,7 @@
                                             {{formatCurrency(account.amount, account.currency)}}
                                         </p>
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                             Type
                                         </p>

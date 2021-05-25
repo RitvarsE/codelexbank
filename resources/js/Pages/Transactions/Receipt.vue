@@ -96,19 +96,21 @@ export default {
         }
     },
     beforeMount() {
-        this.getReceipt()
+        if (this.$props.code) {
+            this.getReceipt()
+        } else {
+            location.href = '/dashboard'
+        }
     },
     methods: {
         getReceipt() {
-            if (this.$props.code) {
-                axios.get('/api/getReceipt/')
-                    .then(res => {
-                        this.receipts = [res.data]
-                        this.receiver = res.data['receiver']
-                        this.sender = res.data['sender']
-                    })
-            }
-            window.location.href = '/dashboard'
+            axios.get('/api/getReceipt/')
+                .then(res => {
+                    this.receipts = [res.data]
+                    this.receiver = res.data['receiver']
+                    this.sender = res.data['sender']
+                })
+
         },
         formatCurrency(money, currency) {
             return new Intl.NumberFormat('en-US', {style: 'currency', currency: currency}).format(money / 100)

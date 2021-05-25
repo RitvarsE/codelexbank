@@ -8,11 +8,6 @@
         <div v-for="transaction in transactions" :key="transaction">
             <div class="mt-4 flex items-center justify-center px-4">
                 <div class="max-w-4xl  bg-white w-full rounded-lg shadow-xl">
-                    <div class="p-3 border-b">
-                        <p class="text-sm text-gray-500">
-                            Receipt #{{transaction.id}}
-                        </p>
-                    </div>
                     <div>
                         <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                             <p class="text-gray-600">
@@ -46,12 +41,20 @@
                                 {{transaction.receiver_account_number}}
                             </p>
                         </div>
-                        <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                        <div v-if="transaction.sender.name !== $page.props.user.name" class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                             <p class="text-gray-600">
                                 Amount
                             </p>
-                            <p>
-                               {{formatCurrency(transaction.amount, transaction.currency)}}
+                            <p class="text-green-600">
+                                + {{formatCurrency(transaction.amount, transaction.currency)}}
+                            </p>
+                        </div>
+                        <div v-else class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                            <p class="text-gray-600">
+                                Amount
+                            </p>
+                            <p class="text-red-500">
+                                - {{formatCurrency(transaction.amount, transaction.currency)}}
                             </p>
                         </div>
                         <div v-if="transaction.tax" class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
