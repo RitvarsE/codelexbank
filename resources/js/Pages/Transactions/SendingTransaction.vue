@@ -5,7 +5,25 @@
                 Sending money
             </h2>
         </template>
-        <div class="py-12">
+        <div v-if="$page.props.code || finishing" class="popup">
+            <div class="center">
+                Check your email for verification code
+                <form @submit.prevent="verifyCode">
+                    <input class="input"
+                           v-model="verify.code"
+                           name="verificationCode"
+                           type="text"
+                           placeholder="verificationCode"
+                           required>
+                    <div>
+                        <button class="btn btn-primary mt-2"
+                                :disabled="verify.code.length < 20"> Verify
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div v-else class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 <div>
@@ -99,24 +117,6 @@
                     </form>
                 </div>
             </div>
-            <div v-if="$page.props.code" class="popup">
-                <div class="center">
-                    Check your email for verification code
-                    <form @submit.prevent="verifyCode">
-                        <input class="input"
-                               v-model="verify.code"
-                               name="verificationCode"
-                               type="text"
-                               placeholder="verificationCode"
-                               required>
-                        <div>
-                            <button class="btn btn-primary mt-2"
-                                    :disabled="verify.code.length < 20"> Verify
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
     </app-layout>
 </template>
@@ -132,6 +132,7 @@ export default {
     },
     data() {
         return {
+            finishing:false,
             bankAccounts: [],
             excludeSenderAccount: [],
             form: this.$inertia.form({
@@ -166,7 +167,7 @@ export default {
             this.verify.post('/api/transaction/', {
                 onSuccess:() => {
                     this.form.post('/api/sendMoney/')
-                }
+                },
             })
         },
         formatCurrency(money, currency) {

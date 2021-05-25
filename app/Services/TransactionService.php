@@ -112,7 +112,7 @@ class TransactionService
         $request->validate([
             'code' => 'exists:App\Models\VerificationCode,code|required'
         ]);
-        return back();
+        return back()->with(['code' => 'redirecting']);
     }
 
     public function receipt(Transaction $transaction): Model
