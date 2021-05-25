@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class TransactionService
 {
@@ -30,11 +31,14 @@ class TransactionService
 
     public function validation(Request $request): RedirectResponse
     {
-        $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
-        $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
+        $senderAccount = $this->accountService
+            ->getAccountByNumber($request->get('senderAccount')['number']);
+        $receiverAccount = $this->accountService
+            ->getAccountByNumber($request->get('receiverAccount'));
 
 
         $request->request->add(['receiver_name_validation' => $receiverAccount->user->name]);
+
         $request->validate([
             'senderAccount.number' => 'required|size:20|alpha_num',
             'senderAccount.amount' => 'required|alpha_num|',
@@ -53,10 +57,13 @@ class TransactionService
         return back()->with(['code' => $verificationCode]);
     }
 
-    public function sendMoney(Request $request)
+    public function sendMoney(Request $request): RedirectResponse
     {
-        $senderAccount = $this->accountService->getAccountByNumber($request->get('senderAccount')['number']);
-        $receiverAccount = $this->accountService->getAccountByNumber($request->get('receiverAccount'));
+        $senderAccount = $this->accountService->
+        getAccountByNumber($request->get('senderAccount')['number']);
+
+        $receiverAccount = $this->accountService
+            ->getAccountByNumber($request->get('receiverAccount'));
 
         $amount = $request->get('sendingAmount') * 100;
 
@@ -110,10 +117,12 @@ class TransactionService
         }
     }
 
-    public function transaction(Request $request)
+    public function transaction(Request $request): RedirectResponse
     {
+        $codeForValidation = $this->codeService->findCode($request);
+
         $request->validate([
-            'code' => 'exists:App\Models\VerificationCode,code|required'
+            'code' => ['exists:App\Models\VerificationCode,code', 'required', Rule::in([$codeForValidation])]
         ]);
         $this->codeService->deleteCode($request);
 

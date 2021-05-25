@@ -5,8 +5,9 @@
                 Sending money
             </h2>
         </template>
-        <div v-if="$page.props.code || finishing" class="popup">
+        <div v-if="$page.props.code || finishing || $page.props.errors.code" class="popup">
             <div class="center">
+                <div v-if="$page.props.errors.code" class="text-red-500"> Incorrect code</div>
                 Check your email for verification code
                 <form @submit.prevent="verifyCode">
                     <input class="input"
@@ -132,7 +133,7 @@ export default {
     },
     data() {
         return {
-            finishing:false,
+            finishing: false,
             bankAccounts: [],
             excludeSenderAccount: [],
             form: this.$inertia.form({
@@ -148,6 +149,7 @@ export default {
             }),
             verify: this.$inertia.form({
                 code: '',
+                userIndex: this.$props.user.id
             })
         }
     },
@@ -165,7 +167,7 @@ export default {
         },
         verifyCode() {
             this.verify.post('/api/transaction/', {
-                onSuccess:() => {
+                onSuccess: () => {
                     this.form.post('/api/sendMoney/')
                 },
             })
