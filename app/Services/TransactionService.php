@@ -99,7 +99,7 @@ class TransactionService
             ]);
 
             DB::commit();
-            return Redirect::route('receipt', $transaction->id);
+            return Redirect::route('receipt')->with(['code' => 'receipt']);
 
         } catch (Exception $error) {
             DB::rollback();
@@ -115,9 +115,12 @@ class TransactionService
         return back()->with(['code' => 'redirecting']);
     }
 
-    public function receipt(Transaction $transaction): Model
+    public function receipt(Request $request): Model
     {
-        return Transaction::with(['sender', 'receiver'])->find($transaction->id);
+        return Transaction::with(['sender', 'receiver'])
+            ->where('sender_id', $request->user()->id)
+            ->latest()
+            ->first();
     }
 
     public function transactionHistory(Request $request): Collection

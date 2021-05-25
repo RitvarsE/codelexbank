@@ -7,11 +7,6 @@
         </template>
         <div v-for="receipt in receipts" :key="receipt" class="mt-4 flex items-center justify-center px-4 mb-10">
             <div class="max-w-4xl  bg-white w-full rounded-lg shadow-xl">
-                <div class="p-4 border-b">
-                    <p class="text-sm text-gray-500">
-                        Receipt #{{ index }}
-                    </p>
-                </div>
                 <div>
                     <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
@@ -53,7 +48,8 @@
                             {{ formatCurrency(receipt.amount, receipt.currency) }}
                         </p>
                     </div>
-                    <div v-if="receipt.tax" class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                    <div v-if="receipt.tax"
+                         class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                         <p class="text-gray-600">
                             Tax
                         </p>
@@ -87,7 +83,7 @@
 import AppLayout from "@/Layouts/AppLayout";
 
 export default {
-
+    props: ['code'],
     components: {
         AppLayout
     },
@@ -100,23 +96,22 @@ export default {
         }
     },
     beforeMount() {
-        this.getIndexFromURL()
         this.getReceipt()
     },
     methods: {
-        getIndexFromURL() {
-            this.index = window.location.pathname.split('/')[2];
-        },
         getReceipt() {
-            axios.get('/api/getReceipt/' + this.index)
-                .then(res => {
-                    this.receipts = [res.data]
-                    this.receiver = res.data['receiver']
-                    this.sender = res.data['sender']
-                })
+            if (this.$props.code) {
+                axios.get('/api/getReceipt/')
+                    .then(res => {
+                        this.receipts = [res.data]
+                        this.receiver = res.data['receiver']
+                        this.sender = res.data['sender']
+                    })
+            }
+            window.location.href = '/dashboard'
         },
-        formatCurrency(money, currency){
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        formatCurrency(money, currency) {
+            return new Intl.NumberFormat('en-US', {style: 'currency', currency: currency}).format(money / 100)
         },
     }
 }

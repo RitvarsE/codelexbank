@@ -27,9 +27,9 @@ class TransactionController extends Controller
         return $this->service->transaction($request);
     }
 
-    public function receipt(Transaction $transaction): JsonResponse
+    public function receipt(Request $request): JsonResponse
     {
-        return response()->json($this->service->receipt($transaction));
+        return response()->json($this->service->receipt($request));
     }
 
     public function sendMoney(Request $request)
