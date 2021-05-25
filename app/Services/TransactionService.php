@@ -19,11 +19,13 @@ class TransactionService
 {
     private GetAccountService $accountService;
     private ConverterService $converterService;
+    private VerificationCodeService $codeService;
 
-    public function __construct(GetAccountService $accountService, ConverterService $converterService)
+    public function __construct(GetAccountService $accountService, ConverterService $converterService, VerificationCodeService $codeService)
     {
         $this->accountService = $accountService;
         $this->converterService = $converterService;
+        $this->codeService = $codeService;
     }
 
     public function validation(Request $request): RedirectResponse
@@ -42,8 +44,9 @@ class TransactionService
             'receiverAccount' => 'required|size:20|Exists:App\Models\BankAccount,number|different:senderAccount.number'
         ]);
 
-        $verificationCode = VerificationCode::create([
-            'code' => bin2hex(openssl_random_pseudo_bytes(10))]);
+        $verificationCode = VerificationCode::UpdateOrCreate(
+            ['user_id' => $request->user()->id],
+            ['code' => bin2hex(openssl_random_pseudo_bytes(10))]);
 
         Mail::to($request->user())->send(new SendVerificationCode($verificationCode));
 
@@ -112,6 +115,8 @@ class TransactionService
         $request->validate([
             'code' => 'exists:App\Models\VerificationCode,code|required'
         ]);
+        $this->codeService->deleteCode($request);
+
         return back()->with(['code' => 'redirecting']);
     }
 

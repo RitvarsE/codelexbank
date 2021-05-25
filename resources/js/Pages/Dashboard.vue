@@ -17,31 +17,35 @@
                         <div class="mt-4 flex items-center justify-center px-4 mb-3">
                             <div class="max-w-2xl  bg-white w-full rounded-lg shadow-xl">
                                 <div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                                    <div
+                                        class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
-                                           Number
+                                            Number
                                         </p>
                                         <p>
-                                            {{account.number}}
+                                            {{ account.number }}
                                         </p>
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                                    <div
+                                        class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                             Currency
                                         </p>
                                         <p>
-                                            {{account.currency}}
+                                            {{ account.currency }}
                                         </p>
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                                    <div
+                                        class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                             Amount
                                         </p>
                                         <p>
-                                            {{formatCurrency(account.amount, account.currency)}}
+                                            {{ formatCurrency(account.amount, account.currency) }}
                                         </p>
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                                    <div
+                                        class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                                         <p class="text-gray-600">
                                             Type
                                         </p>
@@ -83,8 +87,8 @@ export default {
                 this.bankAccounts = response.data
             })
         },
-        formatCurrency(money, currency){
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        formatCurrency(money, currency) {
+            return new Intl.NumberFormat('en-US', {style: 'currency', currency: currency}).format(money / 100)
         },
     },
 
