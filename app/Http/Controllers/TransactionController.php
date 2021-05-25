@@ -22,9 +22,9 @@ class TransactionController extends Controller
         return $this->service->validation($request);
     }
 
-    public function transaction(Request $request): RedirectResponse
+    public function validateVerification(Request $request): RedirectResponse
     {
-        return $this->service->transaction($request);
+        return $this->service->validateVerification($request);
     }
 
     public function receipt(Request $request): JsonResponse

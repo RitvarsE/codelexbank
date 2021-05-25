@@ -117,7 +117,7 @@ class TransactionService
         }
     }
 
-    public function transaction(Request $request): RedirectResponse
+    public function validateVerification(Request $request): RedirectResponse
     {
         $codeForValidation = $this->codeService->findCode($request);
 
