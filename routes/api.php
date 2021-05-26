@@ -35,9 +35,9 @@ Route::get('/history', [TransactionController::class, 'transactionHistory'])->mi
 Route::middleware(['auth:sanctum', 'verified'])->post('/validation', [TransactionController::class, 'validation'])
     ->name('transaction.validate');
 
-Route::middleware(['auth:sanctum', 'verified'])->post('/validateVerification', [TransactionController::class, 'transaction'])
-    ->name('transaction.send');
+Route::middleware(['auth:sanctum', 'verified'])->post('/validateVerification', [TransactionController::class, 'validateVerification'])
+    ->name('transaction.validateVerification');
 
 Route::middleware(['auth:sanctum', 'verified'])->post('/sendMoney', [TransactionController::class, 'sendMoney'])
-    ->name('transaction.validate');
+    ->name('transaction.sending');
 

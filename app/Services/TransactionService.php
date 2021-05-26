@@ -3,7 +3,7 @@
 
 namespace App\Services;
 
-use App\Mail\SendVerificationCode;
+use App\Jobs\SendEmail;
 use App\Models\Transaction;
 use App\Models\VerificationCode;
 use Exception;
@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 
@@ -22,7 +21,10 @@ class TransactionService
     private ConverterService $converterService;
     private VerificationCodeService $codeService;
 
-    public function __construct(GetAccountService $accountService, ConverterService $converterService, VerificationCodeService $codeService)
+    public function __construct(
+        GetAccountService $accountService,
+        ConverterService $converterService,
+        VerificationCodeService $codeService)
     {
         $this->accountService = $accountService;
         $this->converterService = $converterService;
@@ -33,28 +35,39 @@ class TransactionService
     {
         $senderAccount = $this->accountService
             ->getAccountByNumber($request->get('senderAccount')['number']);
-        $receiverAccount = $this->accountService
-            ->getAccountByNumber($request->get('receiverAccount'));
+        $receiverName = $this->accountService
+            ->getAccountByNumber($request->get('receiverAccount'))->user->name;
 
-
-        $request->request->add(['receiver_name_validation' => $receiverAccount->user->name]);
 
         $request->validate([
             'senderAccount.number' => 'required|size:20|alpha_num',
             'senderAccount.amount' => 'required|alpha_num|',
-            'receiver' => 'required|exists:App\Models\User,name|same:receiver_name_validation',
+            'receiver' => ['required', 'exists:App\Models\User,name', Rule::in([$receiverName])],
             'sendingAmount' => 'required|lte:' . $senderAccount->amount / 100,
             'purpose' => 'required|min:5',
-            'receiverAccount' => 'required|size:20|Exists:App\Models\BankAccount,number|different:senderAccount.number'
+            'receiverAccount' => ['required', 'size:20', 'Exists:App\Models\BankAccount,number', 'different:senderAccount.number',
+                Rule::notIn([$senderAccount->number])]
         ]);
 
         $verificationCode = VerificationCode::UpdateOrCreate(
             ['user_id' => $request->user()->id],
             ['code' => bin2hex(openssl_random_pseudo_bytes(10))]);
 
-        Mail::to($request->user())->send(new SendVerificationCode($verificationCode));
+        $details = ['verificationCode' => $verificationCode, 'user' => $request->user()];
+        SendEmail::dispatch($details);
 
-        return back()->with(['code' => $verificationCode]);
+        return back()->with(['code' => 'success']);
+    }
+    public function validateVerification(Request $request): RedirectResponse
+    {
+        $codeForValidation = $this->codeService->findCode($request);
+
+        $request->validate([
+            'code' => ['exists:App\Models\VerificationCode,code', 'required', Rule::in([$codeForValidation])]
+        ]);
+        $this->codeService->deleteCode($request);
+
+        return back()->with(['code' => 'redirecting']);
     }
 
     public function sendMoney(Request $request): RedirectResponse
@@ -97,7 +110,8 @@ class TransactionService
                     'withdraw' => $senderAccount->withdraw + $amount,
                     'tax' => $senderAccount->tax + ($amountForTaxes === $convertedAmount ? 0 : $amountForTaxes)]
             );
-            $transaction = Transaction::create([
+
+            Transaction::create([
                 'sender_id' => $senderAccount->user_id,
                 'receiver_id' => $receiverAccount->user_id,
                 'amount' => $convertedAmount,
@@ -115,18 +129,6 @@ class TransactionService
             DB::rollback();
             return Redirect::route('error');
         }
-    }
-
-    public function validateVerification(Request $request): RedirectResponse
-    {
-        $codeForValidation = $this->codeService->findCode($request);
-
-        $request->validate([
-            'code' => ['exists:App\Models\VerificationCode,code', 'required', Rule::in([$codeForValidation])]
-        ]);
-        $this->codeService->deleteCode($request);
-
-        return back()->with(['code' => 'redirecting']);
     }
 
     public function receipt(Request $request): Model

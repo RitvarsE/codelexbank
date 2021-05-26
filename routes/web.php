@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/transaction', function ()
 
 Route::get('/test', [TransactionController::class, 'transfer']);
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/receipt/', function () {
+Route::middleware(['auth:sanctum', 'verified'])->get('/receipt', function () {
     return Inertia::render('Transactions/Receipt');
 })->name('receipt');
 

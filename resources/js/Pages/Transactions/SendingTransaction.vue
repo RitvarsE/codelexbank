@@ -166,7 +166,7 @@ export default {
             this.form.post('/api/validation/')
         },
         verifyCode() {
-            this.verify.post('/api/transaction/', {
+            this.verify.post('/api/validateVerification/', {
                 onSuccess: () => {
                     this.form.post('/api/sendMoney/')
                 },

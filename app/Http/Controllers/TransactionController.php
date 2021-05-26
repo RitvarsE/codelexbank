@@ -32,7 +32,7 @@ class TransactionController extends Controller
         return response()->json($this->service->receipt($request));
     }
 
-    public function sendMoney(Request $request)
+    public function sendMoney(Request $request): RedirectResponse
     {
         return $this->service->sendMoney($request);
     }
