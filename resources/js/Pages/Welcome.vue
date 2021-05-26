@@ -15,7 +15,20 @@
                 </inertia-link>
             </template>
         </div>
-123123asdkhaskldjakls;dj
+        <div>Welcome to Codelex Bank!</div>
+        <div><img  width="400" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/facebook/65/money-bag_1f4b0.png" alt="bank"></div>
     </div>
 </template>
 
+<style scoped>
+
+</style>
+
+<script>
+    export default {
+        props: {
+            canLogin: Boolean,
+            canRegister: Boolean,
+        }
+    }
+</script>

@@ -95,6 +95,7 @@
                                 placeholder="Amount"
                                 :disabled="amountToLow"
                                 step=".01"
+                                :max="form.senderAccount.amount/100"
                                 required>
                                 <div v-if="form.errors.sendingAmount"
                                      style="margin-bottom: -24px"

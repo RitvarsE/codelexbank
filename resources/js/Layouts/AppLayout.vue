@@ -49,8 +49,11 @@
                                         </button>
                                     </template>
                                     <template #content >
-                                        <jet-dropdown-link :href="route('stocks.purchased')">
-                                            Stocks
+                                        <jet-dropdown-link :href="route('stocks.yourstocks')">
+                                            Your Stocks
+                                        </jet-dropdown-link>
+                                        <jet-dropdown-link :href="route('stocks.buy')">
+                                            Buy Stocks
                                         </jet-dropdown-link>
                                     </template>
                                 </jet-dropdown>

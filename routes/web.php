@@ -53,9 +53,16 @@ Route::get('error', function () {
 Route::middleware(['auth:sanctum', 'verified'])->get('/transactions', function () {
     return Inertia::render('Transactions/History');
 })->name('transactions.history');
-Route::middleware(['auth:sanctum', 'verified'])->get('/stock', function () {
-    return Inertia::render('Stocks/Purchased');
-})->name('stocks.purchased');
+Route::middleware(['auth:sanctum', 'verified'])->get('/buystock', function () {
+    return Inertia::render('Stocks/BuyStock');
+})->name('stocks.buy');
 
-Route::middleware(['auth:sanctum', 'verified'])->post('/validation', [TransactionController::class, 'validation'])
+Route::middleware(['auth:sanctum', 'verified'])
+    ->post('/validation', [TransactionController::class, 'validation'])
     ->name('transaction.send');
+
+Route::middleware(['auth:sanctum', 'verified'])
+    ->get('/yourStocks', function (){
+        return Inertia::render('Stocks/YourStocks');
+    })
+    ->name('stocks.yourstocks');

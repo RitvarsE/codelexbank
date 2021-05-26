@@ -5,6 +5,7 @@
                 Sorry, something went wrong!
             </h2>
         </template>
+        {{$page.props.code}}
     </app-layout>
 </template>
 

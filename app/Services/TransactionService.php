@@ -38,7 +38,6 @@ class TransactionService
         $receiverName = $this->accountService
             ->getAccountByNumber($request->get('receiverAccount'))->user->name;
 
-
         $request->validate([
             'senderAccount.number' => 'required|size:20|alpha_num',
             'senderAccount.amount' => 'required|alpha_num|',
@@ -58,6 +57,7 @@ class TransactionService
 
         return back()->with(['code' => 'success']);
     }
+
     public function validateVerification(Request $request): RedirectResponse
     {
         $codeForValidation = $this->codeService->findCode($request);
@@ -83,7 +83,7 @@ class TransactionService
         $convertedAmount = $this->converterService->convert(
             $senderAccount->currency,
             $receiverAccount->currency,
-            $amount);
+            $amount) / 100;
 
         $amountForTaxes = $convertedAmount;
 

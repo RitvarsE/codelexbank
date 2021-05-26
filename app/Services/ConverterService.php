@@ -41,6 +41,6 @@ class ConverterService
         $rateFrom = Currency::where('name', $from)->first()->rate;
         $rateTo = Currency::where('name', $to)->first()->rate;
 
-        return $amount / $rateFrom * $rateTo;
+        return $amount / $rateFrom * $rateTo * 100;
     }
 }

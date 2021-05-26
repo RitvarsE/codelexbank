@@ -14,6 +14,7 @@ class Stock extends Model
         'price_sold',
         'quantity',
         'user_id',
-        'status'
+        'status',
+        'currency'
     ];
 }

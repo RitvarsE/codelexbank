@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9088bb331d899775ba8e674c9df4beed",
+    "content-hash": "941c539447915e4f79c7ab7f2f55f649",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -958,23 +958,27 @@
         },
         {
             "name": "inertiajs/inertia-laravel",
-            "version": "v0.3.6",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inertiajs/inertia-laravel.git",
-                "reference": "726b1e0d4fc399089dd29820a78e40d1c9aad2eb"
+                "reference": "7ea4e730d82b90b658ca3e863968d2ffd6cc4d06"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/726b1e0d4fc399089dd29820a78e40d1c9aad2eb",
-                "reference": "726b1e0d4fc399089dd29820a78e40d1c9aad2eb",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/7ea4e730d82b90b658ca3e863968d2ffd6cc4d06",
+                "reference": "7ea4e730d82b90b658ca3e863968d2ffd6cc4d06",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^5.4|^6.0|^7.0|^8.0"
+                "ext-json": "*",
+                "laravel/framework": "^5.4|^6.0|^7.0|^8.0",
+                "php": "^7.2|^8.0"
             },
             "require-dev": {
-                "orchestra/testbench": "~3.0"
+                "orchestra/testbench": "^4.0|^5.0|^6.0",
+                "phpunit/phpunit": "^8.0|^9.0",
+                "roave/security-advisories": "dev-master"
             },
             "type": "library",
             "extra": {
@@ -1010,7 +1014,7 @@
             ],
             "support": {
                 "issues": "https://github.com/inertiajs/inertia-laravel/issues",
-                "source": "https://github.com/inertiajs/inertia-laravel/tree/v0.3.6"
+                "source": "https://github.com/inertiajs/inertia-laravel/tree/v0.4.2"
             },
             "funding": [
                 {
@@ -1018,7 +1022,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-01-08T13:16:40+00:00"
+            "time": "2021-05-10T09:56:05+00:00"
         },
         {
             "name": "jaybizzle/crawler-detect",
@@ -8074,7 +8078,10 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.4"
+        "php": "^7.4",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-simplexml": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"

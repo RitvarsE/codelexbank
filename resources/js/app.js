@@ -6,7 +6,7 @@ import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-v
 import { InertiaProgress } from '@inertiajs/progress';
 
 const el = document.getElementById('app');
-
+InertiaProgress.init({ color: '#4B5563' });
 createApp({
     render: () =>
         h(InertiaApp, {
@@ -18,4 +18,3 @@ createApp({
     .use(InertiaPlugin)
     .mount(el);
 
-InertiaProgress.init({ color: '#4B5563' });

@@ -21,6 +21,7 @@ class CreateStocksTable extends Migration
             $table->bigInteger('quantity');
             $table->smallInteger('user_id');
             $table->smallInteger('status');
+            $table->string('currency');
             $table->timestamps();
         });
     }
