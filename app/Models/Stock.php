@@ -15,6 +15,7 @@ class Stock extends Model
         'quantity',
         'user_id',
         'status',
-        'currency'
+        'currency',
+        'bank_number'
     ];
 }

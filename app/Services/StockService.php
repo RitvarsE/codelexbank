@@ -77,10 +77,11 @@ class StockService
             Stock::create([
                 'name' => $stockName,
                 'price_bought' => $stockPrice,
-                'quantity' => $stockAmount,
+                'quantity' => $stockAmount * 100,
                 'user_id' => $request->user()->id,
                 'status' => 1,
-                'currency' => $currency
+                'currency' => $currency,
+                'bank_number' => $account->number
             ]);
             DB::commit();
             return Redirect::route('stocks.yourstocks');
@@ -95,8 +96,28 @@ class StockService
         return Stock::where('user_id', $request->user()->id)->get();
     }
 
-    public function sellStock(Stock $stock): ?bool
+    public function sellStock(Stock $stock)
     {
-        return $stock->delete();
+        DB::beginTransaction();
+        try {
+
+            $priceNow = $this->converterService->convert('USD', $stock->currency, json_decode(
+                file_get_contents(
+                    'https://finnhub.io/api/v1/quote?symbol=' . $stock->name . '&token=c1pj3v2ad3id1hoq2ap0')
+                , true)['c']);
+
+            $account = $this->accountService->getAccountByNumber($stock->bank_number);
+            $account->update([
+                'amount' => $account->amount + ($priceNow * $stock->quantity / 100)
+            ]);
+            $stock->update([
+                'status' => 0,
+                'price_sold' => $priceNow
+
+            ]);
+            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+        }
     }
 }

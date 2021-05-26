@@ -17,7 +17,10 @@ class ConverterService
         $phpArray = json_decode($json, true);
 
         $currencies = $phpArray['Currencies']['Currency'];
-
+        Currency::updateOrCreate(
+            ['name' => 'EUR'],
+            ['rate' => 10000]
+        );
         foreach ($currencies as $currency) {
 
             Currency::updateOrCreate(
@@ -36,7 +39,7 @@ class ConverterService
         return Currency::where('name', $request->get('currency'))->first();
     }
 
-    public function convert(string $from, string $to, int $amount): int
+    public function convert(string $from, string $to, int $amount): float
     {
         $rateFrom = Currency::where('name', $from)->first()->rate;
         $rateTo = Currency::where('name', $to)->first()->rate;

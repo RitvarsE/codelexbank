@@ -7,7 +7,6 @@ use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Ramsey\Collection\Collection;
 
 class StockController extends Controller
 {
@@ -33,7 +32,7 @@ class StockController extends Controller
         return response()->json($this->stockService->getAll($request));
     }
 
-    public function sellStock(Stock $stock): ?bool
+    public function sellStock(Stock $stock)
     {
         return $this->stockService->sellStock($stock);
     }

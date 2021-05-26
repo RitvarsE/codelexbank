@@ -14,7 +14,7 @@
                                 Sender`s name
                             </p>
                             <p>
-                                {{transaction.sender.name}}
+                                {{ transaction.sender.name }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
@@ -22,7 +22,7 @@
                                 Senders`s account
                             </p>
                             <p>
-                                {{transaction.sender_account_number}}
+                                {{ transaction.sender_account_number }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
@@ -30,7 +30,7 @@
                                 Receiver`s name
                             </p>
                             <p>
-                                {{transaction.receiver.name}}
+                                {{ transaction.receiver.name }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
@@ -38,15 +38,16 @@
                                 Receiver`s account number
                             </p>
                             <p>
-                                {{transaction.receiver_account_number}}
+                                {{ transaction.receiver_account_number }}
                             </p>
                         </div>
-                        <div v-if="transaction.sender.name !== $page.props.user.name" class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                        <div v-if="transaction.sender.name !== $page.props.user.name"
+                             class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                             <p class="text-gray-600">
                                 Amount
                             </p>
                             <p class="text-green-600">
-                                + {{formatCurrency(transaction.amount, transaction.currency)}}
+                                + {{ formatCurrency(transaction.amount, transaction.currency) }}
                             </p>
                         </div>
                         <div v-else class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
@@ -54,10 +55,11 @@
                                 Amount
                             </p>
                             <p class="text-red-500">
-                                - {{formatCurrency(transaction.amount, transaction.currency)}}
+                                - {{ formatCurrency(transaction.amount, transaction.currency) }}
                             </p>
                         </div>
-                        <div v-if="transaction.tax" class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
+                        <div v-if="transaction.tax"
+                             class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                             <p class="text-gray-600">
                                 Tax
                             </p>
@@ -70,15 +72,15 @@
                                 Purpose of payment
                             </p>
                             <p>
-                                {{transaction.purpose}}
+                                {{ transaction.purpose }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-3 border-b">
                             <p class="text-gray-600">
-                                Purpose of payment
+                                Date
                             </p>
                             <p>
-                                {{transaction.created_at}}
+                                {{ convertDate(transaction.created_at) }}
                             </p>
                         </div>
                     </div>
@@ -108,15 +110,20 @@ export default {
                     console.log(error.message)
                 })
         },
-        formatCurrency(money, currency){
-           return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(money/100)
+        formatCurrency(money, currency) {
+            return new Intl.NumberFormat('en-US', {style: 'currency', currency: currency}).format(money / 100)
         },
+        convertDate(date) {
+            const DateTime = date.split('T')
+            const time = DateTime[1].split('.')
+            return DateTime[0] + ' ' + time[0];
+        }
     },
     data() {
         return {
             transactions: []
         }
-    }
+    },
 }
 </script>
 

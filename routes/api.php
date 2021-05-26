@@ -48,4 +48,4 @@ Route::post('/buyStock/', [StockController::class, 'buyStock'])->middleware('aut
 
 Route::get('/getAllQuotes/', [StockController::class, 'getAll'])->middleware('auth:sanctum');
 
-Route::delete('/sellStock/{stock}', [StockController::class, 'sellStock'])->middleware('auth:sanctum');
+Route::post('/sellStock/{stock}', [StockController::class, 'sellStock'])->middleware('auth:sanctum');

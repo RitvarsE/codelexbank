@@ -81,40 +81,39 @@ class TransactionService
         $amount = $request->get('sendingAmount') * 100;
 
         $convertedAmount = $this->converterService->convert(
-            $senderAccount->currency,
-            $receiverAccount->currency,
-            $amount) / 100;
+                $senderAccount->currency,
+                $receiverAccount->currency,
+                $amount) / 100;
 
-        $amountForTaxes = $convertedAmount;
+        $amountForTaxes = $amount;
 
         DB::beginTransaction();
 
         try {
-            if ($senderAccount->type === 1 && $convertedAmount + $senderAccount->withdraw > $senderAccount->deposit) {
+            if ($senderAccount->type === 1 && $amount + $senderAccount->withdraw > $senderAccount->deposit) {
                 if ($senderAccount->deposit - $senderAccount->withdraw <= 0) {
-                    $convertedAmount = $convertedAmount * 0.8;
-                    $amountForTaxes -= $convertedAmount;
+                    $amount = $amount * 0.8;
+                    $amountForTaxes -= $amount;
 
                 } else {
-                    $convertedAmount = ($convertedAmount + $senderAccount->withdraw - $senderAccount->deposit)
+                    $amount = ($amount + $senderAccount->withdraw - $senderAccount->deposit)
                         * 0.8 + $senderAccount->deposit - $senderAccount->withdraw;
-                    $amountForTaxes -= $convertedAmount;
+                    $amountForTaxes -= $amount;
                 }
             }
+            $senderAccount->update(
+                ['amount' => $senderAccount->amount - ($amountForTaxes === $amount ? $amount : $amountForTaxes + $amount),
+                    'withdraw' => $senderAccount->withdraw + $amount,
+                    'tax' => $senderAccount->tax + ($amountForTaxes === $amount ? 0 : $amountForTaxes)]
+            );
             $receiverAccount->update(
                 ['amount' => $receiverAccount->amount + $convertedAmount,
                     'deposit' => $receiverAccount->deposit + $convertedAmount]);
 
-            $senderAccount->update(
-                ['amount' => $senderAccount->amount - $amount,
-                    'withdraw' => $senderAccount->withdraw + $amount,
-                    'tax' => $senderAccount->tax + ($amountForTaxes === $convertedAmount ? 0 : $amountForTaxes)]
-            );
-
             Transaction::create([
                 'sender_id' => $senderAccount->user_id,
                 'receiver_id' => $receiverAccount->user_id,
-                'amount' => $convertedAmount,
+                'amount' => $amount,
                 'currency' => $senderAccount->currency,
                 'sender_account_number' => $senderAccount->number,
                 'receiver_account_number' => $receiverAccount->number,

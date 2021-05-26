@@ -70,7 +70,7 @@
                             Purpose of payment
                         </p>
                         <p>
-                            {{ receipt.created_at }}
+                            {{ convertDate(receipt.created_at) }}
                         </p>
                     </div>
                 </div>
@@ -115,6 +115,11 @@ export default {
         formatCurrency(money, currency) {
             return new Intl.NumberFormat('en-US', {style: 'currency', currency: currency}).format(money / 100)
         },
+        convertDate(date) {
+            const DateTime = date.split('T')
+            const time = DateTime[1].split('.')
+            return DateTime[0] + ' ' + time[0];
+        }
     }
 }
 </script>

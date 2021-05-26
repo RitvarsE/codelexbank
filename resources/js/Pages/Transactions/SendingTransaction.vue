@@ -110,6 +110,10 @@
                                        placeholder="Purpose of payment"
                                        required>
                             </div>
+                            <div v-if="form.errors.purpose"
+                                 style="margin-bottom: -24px"
+                                 class="text-red-500"> Purpose must be at least 5 symbols
+                            </div>
                             <button style="margin-top: 10px"
                                     class="btn btn-primary"
                                     :disabled="amountToLow || $page.props.code">
@@ -120,6 +124,7 @@
                 </div>
             </div>
         </div>
+        {{$page.props.errors}}
     </app-layout>
 </template>
 
@@ -185,9 +190,8 @@ export default {
             return this.form.senderAccount.amount <= 0
         },
         excludingSenderAccount() {
-            /// šis jāsataisa, kaut kas nenostrādā.
             this.excludeSenderAccount = _.cloneDeep(this.bankAccounts)
-            this.excludeSenderAccount.splice(this.excludeSenderAccount.indexOf(this.form.senderAccount.number), 1)
+            this.excludeSenderAccount = this.excludeSenderAccount.filter(account => account.number !== this.form.senderAccount.number)
         }
     }
 }
